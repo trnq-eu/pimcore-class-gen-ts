@@ -1,0 +1,1 @@
+# pimcore-class-gen-ts
