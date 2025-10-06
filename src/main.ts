@@ -62,6 +62,46 @@ const records = parse(csvContent, {
   delimiter: ',', // O il delimitatore che usi
 });
 
+// Transform data into a clean typed data structure
+const fieldSpecs: FieldSpec[] = records.map((record: any) => {
+  // Clean bundle name stripping ca_attribute_
+  const normalizeBundle = (bundle: string): { name: string; containerKey?: string } => {
+    let name = bundle.replace(/^ca_attribute_/, ''); // Rimuove il prefisso
+    if (name.includes('.')) {
+      const parts = name.split('.');
+      return {
+        name: parts[1], // es. 'segnatura2'
+        containerKey: parts[0], // es. 'segnatura'
+      };
+    }
+    return { name };
+  };
+
+  const normalized = normalizeBundle(record['Bundle']);
+
+  return {
+    screenId: record['Screen ID'],
+    bundle: record['Bundle'],
+    datatype: record['Datatype'],
+    name: normalized.name,
+    title: record['Name'], // 'Name' column contains the title
+    isContainer: record['is container'] === 'TRUE',
+    isRipetibile: record['is ripetibile'] === 'TRUE',
+    wysiwyg: record['wysiwyg'] === 'TRUE',
+    listValues: record['List Values'] ? record['List Values'].split(';').map((v: string) => v.trim()) : [],
+    containerKey: normalized.containerKey,
+  };
+});
+
+// Aggiungi anche la 'containerKey' all'interfaccia FieldSpec in pimcore-types.ts
+// export interface FieldSpec {
+//   ...
+//   listValues: string[];
+//   containerKey?: string; // <-- Aggiungi questa linea
+// }
+
+// Class generation
+
 export class PimcoreClassGenerator {
     private classDefinition: PimcoreClassDefinition;
 

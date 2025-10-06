@@ -9,6 +9,7 @@ export interface FieldSpec {
   isRipetibile: boolean;
   wysiwyg: boolean;
   listValues: string[];
+  containerKey?: string;
 }
 
 export interface PimcoreClassDefinition {
