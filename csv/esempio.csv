@@ -1,0 +1,12 @@
+Screen ID,Type Restriction,Bundle,Datatype,List,Name,is container,is ripetibile,wysiwyg,List Values
+IDENTIFICAZIONE,documento,ca_attribute_extent2.extent_type,List,TipologiaConsistenza,Tipologia,TRUE,TRUE,,busta/e; cartella/e; disegno/i; dossier; faldone/i; fascicolo/i; filza/e; foglio/fogli sciolti; fototipo/i; libro/i; manifesto/i; mappa/e; mazzo/i; opuscolo/i; pacco/pacchi; plico/plichi; quaderno/i; raccoglitore ad anelli; registro/i; rivista/e; rotolo/i; scatola/e; scheda/e; taccuino/i; volume/i; carta/e; pagina/e; pezzo/i; metro/i
+IDENTIFICAZIONE,documento,ca_attribute_extent2.unit_extent,Numeric,,Quantità,TRUE,TRUE,,
+IDENTIFICAZIONE,documento,ca_attribute_extent2.consistenza_specifica,Text,,Consistenza (testo libero),TRUE,TRUE,,
+CONTESTO,documento,ca_attribute_tipologiaGiuridica,List,tipologia_giuridica,Tipologia giuridica,FALSE,FALSE,,Copia autentica; Copia semplice; Originale; Copia vidimata; Copia imitativa
+CONTESTO,documento,ca_attribute_acqinfo,Text,,Modalità di acquisizione,FALSE,FALSE,,
+CONTESTO,documento,ca_attribute_protocollo,Text,,Protocollo,FALSE,FALSE,,
+CONTESTO,documento,ca_attribute_code,Text,,Classificazione,FALSE,TRUE,,
+CONTESTO,documento,ca_attribute_segnatura.segnatura2,Text,,Segnatura,TRUE,TRUE,,
+CONTESTO,documento,ca_attribute_segnatura.tipologia_segnatura,List,tipoSegnatura,Tipologia,TRUE,TRUE,,originale; precedente inventario
+CONTESTO,documento,ca_attribute_segnatura.note_segnatura,Text,,Note,TRUE,TRUE,,
+CONTENUTO,documento,ca_attribute_accruals,Text,,Incrementi previsti,FALSE,FALSE,TRUE,

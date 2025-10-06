@@ -4,7 +4,7 @@
 
 ```
 npx tsc
-node dist/main.js
+node dist/main.js ./csv/esempio.csv
 ```
 
 ## To-do

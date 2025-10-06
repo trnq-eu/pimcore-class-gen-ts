@@ -34,6 +34,33 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PimcoreClassGenerator = void 0;
+const sync_1 = require("csv-parse/sync");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+// read csv file
+// read command line argument
+const csvFilePathArg = process.argv[2];
+// check if the argument is present
+if (!csvFilePathArg) {
+    console.error('Errore: Percorso del file CSV non fornito.');
+    console.log('Uso: node dist/main.js <percorso-del-file-csv>');
+    process.exit(1); // Esce dal programma con un codice di errore
+}
+// make path absolut
+const csvFilePath = path.resolve(csvFilePathArg);
+// check if file exists
+if (!fs.existsSync(csvFilePath)) {
+    console.error(`Error: File not found at path: ${csvFilePath}`);
+    process.exit(1);
+}
+// read and process csv file
+console.log(`Reading file: ${csvFilePath}`);
+const csvContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' });
+const records = (0, sync_1.parse)(csvContent, {
+    columns: true,
+    skip_empty_lines: true,
+    delimiter: ',', // O il delimitatore che usi
+});
 class PimcoreClassGenerator {
     classDefinition;
     constructor(baseDefinition) {
@@ -550,8 +577,6 @@ class PimcoreClassGenerator {
     }
 }
 exports.PimcoreClassGenerator = PimcoreClassGenerator;
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
 const generator = new PimcoreClassGenerator();
 generator.setClassId('50');
 const tabPanel = generator.createTabPanel({

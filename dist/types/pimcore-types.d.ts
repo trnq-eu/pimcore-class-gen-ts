@@ -1,3 +1,14 @@
+export interface FieldSpec {
+    screenId: string;
+    bundle: string;
+    datatype: 'List' | 'Numeric' | 'Text';
+    name: string;
+    title: string;
+    isContainer: boolean;
+    isRipetibile: boolean;
+    wysiwyg: boolean;
+    listValues: string[];
+}
 export interface PimcoreClassDefinition {
     id: string;
     title: string;

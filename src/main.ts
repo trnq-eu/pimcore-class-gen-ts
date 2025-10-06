@@ -1,5 +1,10 @@
+import { parse } from 'csv-parse/sync';
+import * as fs from 'fs';
+import * as path from 'path';
+
 import type {
   PimcoreClassDefinition,
+  FieldSpec,
   LayoutDefinition,
   DataDefinition,
   PropertyVisibility,
@@ -23,6 +28,39 @@ import type {
   AnyFieldDefinition,
   AnySpecificFieldDefinition,
 } from './types/pimcore-types';
+
+
+// read csv file
+// read command line argument
+const csvFilePathArg = process.argv[2];
+
+// check if the argument is present
+if (!csvFilePathArg) {
+  console.error('Errore: Percorso del file CSV non fornito.');
+  console.log('Uso: node dist/main.js <percorso-del-file-csv>');
+  process.exit(1); // Esce dal programma con un codice di errore
+}
+
+// make path absolut
+const csvFilePath = path.resolve(csvFilePathArg);
+
+// check if file exists
+
+if (!fs.existsSync(csvFilePath)) {
+    console.error(`Error: File not found at path: ${csvFilePath}`);
+    process.exit(1);
+}
+
+// read and process csv file
+console.log(`Reading file: ${csvFilePath}`);
+
+const csvContent = fs.readFileSync(csvFilePath, { encoding: 'utf-8' });
+
+const records = parse(csvContent, {
+  columns: true,
+  skip_empty_lines: true,
+  delimiter: ',', // O il delimitatore che usi
+});
 
 export class PimcoreClassGenerator {
     private classDefinition: PimcoreClassDefinition;
@@ -566,8 +604,7 @@ export class PimcoreClassGenerator {
   }
 }
 
-import * as fs from 'fs';
-import * as path from 'path';
+
 
 const generator = new PimcoreClassGenerator();
 
