@@ -90,7 +90,7 @@ const fieldSpecs = records.map((record) => {
     };
 });
 console.log('Normalized fieldSpecs:', fieldSpecs);
-// Class generation
+// ---CLASS GENERATION---
 class PimcoreClassGenerator {
     classDefinition;
     constructor(baseDefinition) {
@@ -608,11 +608,14 @@ class PimcoreClassGenerator {
 }
 exports.PimcoreClassGenerator = PimcoreClassGenerator;
 const generator = new PimcoreClassGenerator();
+generator.setClassId('GeneratedClass'); // Potresti renderlo dinamico
+generator.setTitle('Generated Class');
 generator.setClassId('50');
 const tabPanel = generator.createTabPanel({
     name: 'Scheda descrittiva',
     title: 'Scheda descrittiva',
 });
+generator.addRootField(tabPanel);
 const identificazionePanel = generator.createPanel({
     name: 'Identificazione',
     title: 'IDENTIFICAZIONE',
@@ -989,7 +992,66 @@ tabPanel.children.push(identificazionePanel);
 tabPanel.children.push(controlloNotePanel);
 tabPanel.children.push(mediaPanel);
 tabPanel.children.push(sommarioPanel);
-generator.addRootField(tabPanel);
+const panelNameMapping = {
+    'IDENTIFICAZIONE': 'Identificazione',
+    'CONTROLLO E NOTE': 'Controllo e note',
+    'MEDIA E COLLEGAMENTI': 'Media',
+    // Aggiungi altre mappature se necessario
+};
+// Controlla se il CSV richiede pannelli che non esistono nella base statica e creali.
+const existingPanelNames = new Set(Object.values(panelNameMapping));
+// Find all unique screenId
+const screenIds = [...new Set(fieldSpecs.map(spec => spec.screenId))];
+// Crea un pannello per ogni screenId e lo aggiunge al TabPanel
+screenIds.forEach(id => {
+    const technicalName = panelNameMapping[id] || id.toLowerCase().replace(/\s+/g, '_');
+    if (!existingPanelNames.has(technicalName)) {
+        console.log(`Pannello dinamico '${id}' non trovato nella base statica. Lo creo...`);
+        const newPanel = generator.createPanel({
+            name: technicalName,
+            title: id.toUpperCase(),
+        });
+        tabPanel.children.push(newPanel);
+        panelNameMapping[id] = technicalName; // Aggiorna la mappa per dopo
+    }
+});
+// Ora itera su TUTTI i campi del CSV e inseriscili nel pannello corretto.
+fieldSpecs.forEach(spec => {
+    let newField = null;
+    const targetPanelName = panelNameMapping[spec.screenId];
+    if (!targetPanelName) {
+        console.warn(`Attenzione: Nessun pannello di destinazione trovato per lo Screen ID '${spec.screenId}'. Il campo '${spec.name}' sarà saltato.`);
+        return;
+    }
+    // Qui inseriremo la logica per isContainer e isRipetibile. Per ora, gestiamo i semplici.
+    if (spec.isContainer || spec.isRipetibile) {
+        // TODO: Implementare logica per contenitori e campi ripetibili
+        return;
+    }
+    // Crea il campo in base al datatype
+    switch (spec.datatype) {
+        case 'Text':
+            newField = spec.wysiwyg
+                ? generator.createWysiwygField({ name: spec.name, title: spec.title })
+                : generator.createTextareaField({ name: spec.name, title: spec.title });
+            break;
+        case 'Numeric':
+            newField = generator.createInputField({ name: spec.name, title: spec.title });
+            break;
+        case 'List':
+            newField = generator.createSelectField({
+                name: spec.name,
+                title: spec.title,
+                options: spec.listValues.map(val => ({ key: val, value: val })),
+            });
+            break;
+    }
+    // Se il campo è stato creato, INIETTALO nel pannello corretto
+    if (newField) {
+        generator.addFieldToContainer(targetPanelName, newField);
+    }
+});
+// generator.addRootField(tabPanel);
 const generatedClass = generator.generateJsonString();
 const outputPath = path.join(__dirname, '..', 'GeneratedClass.json');
 fs.writeFile(outputPath, generatedClass, (err) => {
