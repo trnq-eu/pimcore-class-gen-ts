@@ -93,14 +93,9 @@ const fieldSpecs: FieldSpec[] = records.map((record: any) => {
   };
 });
 
-// Aggiungi anche la 'containerKey' all'interfaccia FieldSpec in pimcore-types.ts
-// export interface FieldSpec {
-//   ...
-//   listValues: string[];
-//   containerKey?: string; // <-- Aggiungi questa linea
-// }
+console.log('Normalized fieldSpecs:', fieldSpecs);
 
-// Class generation
+// ---CLASS GENERATION---
 
 export class PimcoreClassGenerator {
     private classDefinition: PimcoreClassDefinition;
@@ -647,6 +642,8 @@ export class PimcoreClassGenerator {
 
 
 const generator = new PimcoreClassGenerator();
+generator.setClassId('GeneratedClass'); // Potresti renderlo dinamico
+generator.setTitle('Generated Class');
 
 generator.setClassId('50');
 
@@ -654,6 +651,23 @@ const tabPanel = generator.createTabPanel({
     name: 'Scheda descrittiva',
     title: 'Scheda descrittiva',
 });
+
+// Find all unique screenId
+const screenIds = [...new Set(fieldSpecs.map(spec => spec.screenId))];
+
+
+// Crea un pannello per ogni screenId e lo aggiunge al TabPanel
+screenIds.forEach(id => {
+    const panel = generator.createPanel({
+        // Usiamo un nome tecnico pulito per il pannello
+        name: `${id.toLowerCase().replace(/\s+/g, '_')}_panel`,
+        title: id.toUpperCase(), // Manteniamo il titolo originale in maiuscolo
+    });
+    tabPanel.children.push(panel);
+});
+
+generator.addRootField(tabPanel);
+
 
 const identificazionePanel = generator.createPanel({
     name: 'Identificazione',
